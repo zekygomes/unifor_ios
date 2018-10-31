@@ -22,7 +22,12 @@ class TasksTableViewController: UITableViewController {
         task1!.priority = "B"
         task1!.status = false
         
-        print("ddd")
+        let task2 : Task?
+        task2 = TaskDB.instance.newTask()
+        
+        task2!.name = "Teste2"
+        task2!.priority = "A"
+        task2!.status = true
         
         TaskDB.instance.saveContext()
         

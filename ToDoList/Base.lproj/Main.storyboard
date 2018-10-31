@@ -54,7 +54,7 @@
                     <navigationItem key="navigationItem" title="TO DO List" id="27c-ov-7Cz">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="nmD-XJ-e9D">
                             <connections>
-                                <segue destination="BYZ-38-t0r" kind="show" identifier="ToSave" id="VWY-OU-YUR"/>
+                                <segue destination="BYZ-38-t0r" kind="show" identifier="" id="VWY-OU-YUR"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -122,7 +122,7 @@
                     <navigationItem key="navigationItem" title="Task" id="3me-3L-l6X">
                         <barButtonItem key="rightBarButtonItem" systemItem="save" id="IQP-ru-eDG">
                             <connections>
-                                <segue destination="9Wc-UP-DeZ" kind="unwind" unwindAction="unwindToTaskListWithSegue:" id="irw-55-cvO"/>
+                                <segue destination="9Wc-UP-DeZ" kind="unwind" identifier="Save" unwindAction="unwindToTaskListWithSegue:" id="irw-55-cvO"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>

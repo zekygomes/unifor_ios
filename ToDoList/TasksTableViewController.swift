@@ -9,27 +9,27 @@
 import UIKit
 
 class TasksTableViewController: UITableViewController {
-    
+    let section = ["To Do", "Done"]
     var tasks = [Task]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let task1 : Task?
-        task1 = TaskDB.instance.newTask()
-        
-        task1!.name = "Teste"
-        task1!.priority = "B"
-        task1!.status = false
-        
-        let task2 : Task?
-        task2 = TaskDB.instance.newTask()
-        
-        task2!.name = "Teste2"
-        task2!.priority = "A"
-        task2!.status = true
-        
-        TaskDB.instance.saveContext()
+//        let task1 : Task?
+//        task1 = TaskDB.instance.newTask()
+//
+//        task1!.name = "Teste"
+//        task1!.priority = "B"
+//        task1!.status = false
+//
+//        let task2 : Task?
+//        task2 = TaskDB.instance.newTask()
+//
+//        task2!.name = "Teste2"
+//        task2!.priority = "A"
+//        task2!.status = true
+//
+//        TaskDB.instance.saveContext()
         
         self.tasks = TaskDB.instance.allTasks()
         self.tableView.reloadData()
@@ -45,21 +45,50 @@ class TasksTableViewController: UITableViewController {
     
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
-        return 1
+        return 2
+    }
+    
+    // MARK: - Table view data source
+    
+    override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        
+        return self.section[section]
+        
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
-        return self.tasks.count
+        var count:Int = 0
+        
+        if (section == 0) {
+            for _ in self.tasks{
+                if tasks.contains(where: {$0.status==false}){
+                    count += 1
+                }
+            }
+        }else{
+            for _ in self.tasks{
+                if tasks.contains(where: {$0.status==true}){
+                    count += 1
+                }
+            }
+        }
+        
+        return count
+
     }
-    
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "TaskCell", for: indexPath) as! TaskTableViewCell
+        print()
+
+       
+        if tasks.contains(where: {$0.status == Bool(truncating: indexPath.section as NSNumber)}){
+            cell.name.text = self.tasks[indexPath.row].name!
+            cell.priority.backgroundColor = self.setPriorityColor(index:self.tasks[indexPath.row].priority!)
+            cell.status = self.tasks[indexPath.row].status
+        }
         
-        cell.name.text = self.tasks[indexPath.row].name!
-        cell.priority.backgroundColor = self.setPriorityColor(index:self.tasks[indexPath.row].priority!)
-        cell.status = self.tasks[indexPath.row].status
+
         
         return cell
     }
@@ -104,7 +133,8 @@ class TasksTableViewController: UITableViewController {
             TaskDB.instance.delete(task: toRemove)
             TaskDB.instance.saveContext()
             
-            tableView.deleteRows(at: [indexPath], with: .fade)
+            
+            tableView.reloadData()
         } else if editingStyle == .insert {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
         }
@@ -127,10 +157,10 @@ class TasksTableViewController: UITableViewController {
     }
     
     func setPriorityColor(index:String) -> UIColor {
-        var color = UIColor.cyan
+        var color = UIColor.red
         
-        if index == "B" {color = UIColor.black}
-        if index == "M" {color = UIColor.blue}
+        if index == "B" {color = UIColor.green}
+        if index == "M" {color = UIColor.orange}
         
         return color
     }

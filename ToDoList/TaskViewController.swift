@@ -23,7 +23,7 @@ class TaskViewController: UIViewController, UINavigationControllerDelegate {
             
             self.name.text = task.name
             self.priority.selectedSegmentIndex = self.setPriorityByIndex(letter: task.priority!)
-            self.status.isOn = Bool(true)
+            self.status.isOn = Bool(task.status)
         }
         // Do any additional setup after loading the view.
     }
@@ -50,6 +50,7 @@ class TaskViewController: UIViewController, UINavigationControllerDelegate {
             self.task?.name = self.name.text
             self.task?.priority = setPriorityColor(index:self.priority.selectedSegmentIndex)
             self.task?.status = self.status.isOn
+            
         }
      
     }

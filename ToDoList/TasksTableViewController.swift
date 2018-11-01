@@ -10,7 +10,9 @@ import UIKit
 
 class TasksTableViewController: UITableViewController {
     let section = ["To Do", "Done"]
-    var tasks = [Task]()
+    var tasksTemp = [Task]()
+    
+    var taskInSections: Array<Array<Task>> = [[], []]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,7 +33,14 @@ class TasksTableViewController: UITableViewController {
 //
 //        TaskDB.instance.saveContext()
         
-        self.tasks = TaskDB.instance.allTasks()
+        self.tasksTemp = TaskDB.instance.allTasks()
+        
+        self.taskInSections[0] = self.tasksTemp.filter({$0.status==false})
+        self.taskInSections[1] = self.tasksTemp.filter({$0.status==true})
+        
+        print(self.taskInSections[0])
+        print(self.taskInSections[1])
+        
         self.tableView.reloadData()
         
     }
@@ -57,39 +66,29 @@ class TasksTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        var count:Int = 0
-        
-        if (section == 0) {
-            for _ in self.tasks{
-                if tasks.contains(where: {$0.status==false}){
-                    count += 1
-                }
-            }
-        }else{
-            for _ in self.tasks{
-                if tasks.contains(where: {$0.status==true}){
-                    count += 1
-                }
-            }
-        }
-        
-        return count
+//        var count:Int = 0s
+        print(self.taskInSections[section].count)
+        return self.taskInSections[section].count
+//        if (section == 0) {
+//
+//            count = tasks.filter({$0.status==false}).count
+//
+//        }else{
+//
+//            count = tasks.filter({$0.status==true}).count
+//        }
+//
+//        return count
 
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "TaskCell", for: indexPath) as! TaskTableViewCell
-        print()
 
-       
-        if tasks.contains(where: {$0.status == Bool(truncating: indexPath.section as NSNumber)}){
-            cell.name.text = self.tasks[indexPath.row].name!
-            cell.priority.backgroundColor = self.setPriorityColor(index:self.tasks[indexPath.row].priority!)
-            cell.status = self.tasks[indexPath.row].status
-        }
-        
+        cell.name.text = self.taskInSections[indexPath.section][indexPath.row].name!
+        cell.priority.backgroundColor = self.setPriorityColor(index:self.taskInSections[indexPath.section][indexPath.row].priority!)
+        cell.status = self.taskInSections[indexPath.section][indexPath.row].status
 
-        
         return cell
     }
     
@@ -97,22 +96,31 @@ class TasksTableViewController: UITableViewController {
        
         if let indexPath = self.tableView.indexPathForSelectedRow {
             if let svc = segue.source as? TaskViewController {
-                self.tasks[indexPath.row] = svc.task!
+                self.taskInSections[indexPath.section][indexPath.row] = svc.task!
                 self.tableView.reloadData()
                 
-                TaskDB.instance.saveContext()
             }
-            print("bbb")
+            
         } else if(segue.identifier == "Save") {
-            print("aaaa")
+            
             if let svc = segue.source as? TaskViewController {
                 if let task = svc.task {
-                    self.tasks.append(task)
+                    if(task.status){
+                        self.taskInSections[1].append(task)
+                        
+                    }
+                    else{
+                        self.taskInSections[0].append(task)
+                    }
+                    
                     self.tableView.reloadData()
                 }
                 
             }
+            
         }
+        TaskDB.instance.saveContext()
+        self.tableView.reloadData()
     }
     
     /*
@@ -128,11 +136,11 @@ class TasksTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             // Delete the row from the data source
-            let toRemove = self.tasks.remove(at: indexPath.row)
+            let toRemove = self.taskInSections[indexPath.section].remove(at: indexPath.row)
             
             TaskDB.instance.delete(task: toRemove)
             TaskDB.instance.saveContext()
-            
+            self.tableView.reloadData()
             
             tableView.reloadData()
         } else if editingStyle == .insert {
@@ -147,10 +155,10 @@ class TasksTableViewController: UITableViewController {
             
             if let dvc = segue.destination as? TaskViewController {
                 let indexPath = self.tableView.indexPath(for: sender as! UITableViewCell)
-                let task = self.tasks[indexPath!.row]
+                let task = self.taskInSections[indexPath!.section][indexPath!.row]
                 
                 dvc.task = task
-                
+                self.tableView.reloadData()
                 
             }
         }
